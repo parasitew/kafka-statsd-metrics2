@@ -17,13 +17,18 @@ This project provides a simple integration between Kafka and a StatsD reporter f
 Metrics can be filtered based on the metric name and the metric dimensions (min, max, percentiles, etc).
 
 ## Supported Kafka versions
-
+- For Kafka `0.9.0.0` or later use `kafka-statsd-metrics2-0.5.0`
 - For Kafka `0.8.2.0` or later use `kafka-statsd-metrics2-0.4.0`
 - For Kafka `0.8.1.1` or prior use `kafka-statsd-metrics2-0.3.0`
 
 
 ## Releases
- 
+### 0.5.0
+
+ - `0.5.0` adds support for new producer/consumer in kafka 0.9.0
+ - [New producer metrics](http://kafka.apache.org/documentation.html#new_producer_monitoring) are introduced in kafka 0.9.0
+
+
 ### 0.4.0
 
  - `0.4.0` adds support for tags on metrics. See [dogstatsd extensions](http://docs.datadoghq.com/guides/dogstatsd/#tags). If your statsd server does not support tags, you can disable them in the Kafka configuration. See property `external.kafka.statsd.tag.enabled` below.
@@ -38,14 +43,17 @@ Metrics can be filtered based on the metric name and the metric dimensions (min,
 ## How to install?
 
 - [Download](https://bintray.com/airbnb/jars/kafka-statsd-metrics2/view) or build the shadow jar for `kafka-statsd-metrics`.
-- Install the jar in Kafka classpath, typically `./kafka_2.9.2-0.8.2.1/libs/`
+- Install the jar in Kafka classpath, typically `./kafka_2.9.2-0.9.0.1/libs/`
 - In the Kafka config file, `server.properties`, add the following properties. Default values are in parenthesis.
 
 
 
 ```bash
 
-    # declare the reporter
+    # declare the reporter if new producer/consumer is used
+    metric.reporters=com.airbnb.kafka.StatsdMetricsReporter
+
+    # declare the reporter if old producer/consumer is used
     kafka.metrics.reporters=com.airbnb.kafka.KafkaStatsdMetricsReporter
 
     # enable the reporter, (false)
