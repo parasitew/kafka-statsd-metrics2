@@ -40,7 +40,7 @@ import org.apache.kafka.common.metrics.MetricsReporter;
 import org.slf4j.LoggerFactory;
 
 public class NewStatsdMetricsReporter implements MetricsReporter {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(StatsDReporter.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(NewStatsDReporter.class);
 
   static final String STATSD_REPORTER_ENABLED = "external.kafka.statsd.reporter.enabled";
   static final String STATSD_HOST = "external.kafka.statsd.host";
