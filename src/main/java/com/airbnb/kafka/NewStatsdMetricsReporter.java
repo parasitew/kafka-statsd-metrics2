@@ -120,15 +120,15 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
   @Override
   public void configure(Map<String, ?> configs) {
     enabled = configs.containsKey(STATSD_REPORTER_ENABLED) ?
-        (Boolean)configs.get(STATSD_REPORTER_ENABLED) : false;
+        Boolean.valueOf((String) configs.get(STATSD_REPORTER_ENABLED)) : false;
     host = configs.containsKey(STATSD_HOST) ?
-        (String) configs.get(STATSD_HOST) : "localhost1";
+        (String) configs.get(STATSD_HOST) : "localhost";
     port = configs.containsKey(STATSD_PORT) ?
-        (Integer) configs.get(STATSD_PORT) : 8125;
+        Integer.parseInt((String) configs.get(STATSD_PORT)) : 8125;
     prefix = configs.containsKey(STATSD_METRICS_PREFIX) ?
         (String) configs.get(STATSD_METRICS_PREFIX) : "";
     pollingPeriodInSeconds = configs.containsKey(POLLING_INTERVAL_SECS) ?
-        (Integer) configs.get(POLLING_INTERVAL_SECS) : 10;
+        Integer.parseInt((String) configs.get(POLLING_INTERVAL_SECS)) : 10;
     metricDimensions = Dimension.fromConfigs(configs, STATSD_DIMENSION_ENABLED);
   }
 
