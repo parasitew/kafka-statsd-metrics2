@@ -108,8 +108,22 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
 
   @Override
   public void metricRemoval(KafkaMetric metric) {
-    MetricName metricName = new MetricName(null, metric.metricName().group());
-    registry.removeMetric(metricName);
+    // Add new metrics in registry.
+    org.apache.kafka.common.MetricName metricName = metric.metricName();
+    String name = "kafka." + metricName.group() + "." + metricName.name();
+
+    StringBuilder strBuilder = new StringBuilder();
+
+    for (String key : metric.metricName().tags().keySet()) {
+      strBuilder.append(key).append(":").append(metric.metricName().tags().get(key)).append(",");
+    }
+
+    if (strBuilder.length() > 0) {
+      strBuilder.deleteCharAt(strBuilder.length() - 1);
+    }
+
+    MetricName metricNameToRemove = new MetricName(NewStatsdMetricsReporter.class, name, strBuilder.toString());
+    registry.removeMetric(metricNameToRemove);
   }
 
   @Override
