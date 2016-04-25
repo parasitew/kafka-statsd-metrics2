@@ -60,7 +60,7 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
   private MetricsRegistry registry;
   private Map<String, KafkaMetric> kafkaMetrics;
 
-  private boolean isTagEnabled;
+  private Boolean isTagEnabled;
 
   private AbstractPollingReporter underlying = null;
 

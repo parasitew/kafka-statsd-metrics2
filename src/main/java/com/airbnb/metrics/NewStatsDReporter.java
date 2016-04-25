@@ -63,7 +63,7 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
   private final StatsDClient statsd;
   private final Clock clock;
   private final EnumSet<Dimension> dimensions;
-  private final Boolean isTagEnabled;
+  private Boolean isTagEnabled;
 
 
   public NewStatsDReporter(MetricsRegistry metricsRegistry,
@@ -83,6 +83,11 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
     this.dimensions = metricDimensions;
     this.clock = Clock.defaultClock();
     this.isTagEnabled = isTagEnabled;
+
+    if (isTagEnabled) {
+      log.info("Kafka metrics are tagged");
+    }
+
   }
 
   @Override
