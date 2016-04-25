@@ -18,9 +18,7 @@ package com.airbnb.metrics;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.timgroup.statsd.StatsDClient;
 import com.yammer.metrics.core.Clock;
@@ -187,11 +185,11 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
     statsd.gauge(metricName.getName() + "." + dim.getDisplayName(), value, getTags(metricName));
   }
 
-  private String getTags(MetricName metricName) {
+  private String[] getTags(MetricName metricName) {
     if (this.isTagEnabled) {
-      return metricName.getScope();
+      return new String[]{ metricName.getScope() };
     } else {
-      return "";
+      return new String[] {};
     }
   }
 
