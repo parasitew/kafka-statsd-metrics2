@@ -18,7 +18,6 @@ package com.airbnb.kafka;
 
 import com.airbnb.metrics.Dimension;
 import com.airbnb.metrics.NewStatsDReporter;
-import com.airbnb.metrics.StatsDReporter;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -46,6 +45,7 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
   static final String STATSD_HOST = "external.kafka.statsd.host";
   static final String STATSD_PORT = "external.kafka.statsd.port";
   static final String STATSD_METRICS_PREFIX = "external.kafka.statsd.metrics.prefix";
+  static final String STATSD_TAGS_ENABLED = "external.kafka.statsd.tag.enabled";
   static final String POLLING_INTERVAL_SECS = "kafka.metrics.polling.interval.secs";
   static final String STATSD_DIMENSION_ENABLED = "external.kafka.statsd.dimension.enabled";
 
@@ -59,6 +59,8 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
   private StatsDClient statsd;
   private MetricsRegistry registry;
   private Map<String, KafkaMetric> kafkaMetrics;
+
+  private boolean isTagEnabled;
 
   private AbstractPollingReporter underlying = null;
 
@@ -144,6 +146,9 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
     pollingPeriodInSeconds = configs.containsKey(POLLING_INTERVAL_SECS) ?
         Integer.parseInt((String) configs.get(POLLING_INTERVAL_SECS)) : 10;
     metricDimensions = Dimension.fromConfigs(configs, STATSD_DIMENSION_ENABLED);
+
+    isTagEnabled = configs.containsKey(STATSD_TAGS_ENABLED) ?
+            Boolean.valueOf((String) configs.get(STATSD_TAGS_ENABLED)) : false;
   }
 
   public void startReporter(long pollingPeriodInSeconds) {
@@ -161,7 +166,8 @@ public class NewStatsdMetricsReporter implements MetricsReporter {
         underlying = new NewStatsDReporter(
             Metrics.defaultRegistry(),
             statsd,
-            metricDimensions);
+            metricDimensions,
+            isTagEnabled);
         underlying.start(pollingPeriodInSeconds, TimeUnit.SECONDS);
         log.info("Started Reporter with host={}, port={}, polling_period_secs={}, prefix={}",
             host, port, pollingPeriodInSeconds, prefix);
