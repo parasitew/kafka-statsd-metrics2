@@ -18,9 +18,7 @@ package com.airbnb.metrics;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.timgroup.statsd.StatsDClient;
 import com.yammer.metrics.core.Clock;
@@ -63,22 +61,31 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
   private final StatsDClient statsd;
   private final Clock clock;
   private final EnumSet<Dimension> dimensions;
+  private Boolean isTagEnabled;
 
 
   public NewStatsDReporter(MetricsRegistry metricsRegistry,
                            StatsDClient statsd,
-                           EnumSet<Dimension> metricDimensions) {
-    this(metricsRegistry, statsd, metricDimensions, REPORTER_NAME);
+                           EnumSet<Dimension> metricDimensions,
+                           Boolean isTagEnabled) {
+    this(metricsRegistry, statsd, metricDimensions, REPORTER_NAME, isTagEnabled);
   }
 
   public NewStatsDReporter(MetricsRegistry metricsRegistry,
                            StatsDClient statsd,
                            EnumSet<Dimension> metricDimensions,
-                           String reporterName) {
+                           String reporterName,
+                           Boolean isTagEnabled) {
     super(metricsRegistry, reporterName);
     this.statsd = statsd;               //exception in statsd is handled by default NO_OP_HANDLER (do nothing)
     this.dimensions = metricDimensions;
     this.clock = Clock.defaultClock();
+    this.isTagEnabled = isTagEnabled;
+
+    if (isTagEnabled) {
+      log.info("Kafka metrics are tagged");
+    }
+
   }
 
   @Override
@@ -112,7 +119,7 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
 
   @Override
   public void processCounter(MetricName metricName, Counter counter, Long context) throws Exception {
-    statsd.gauge(metricName.getMBeanName(), counter.count(), metricName.getScope());
+    statsd.gauge(metricName.getMBeanName(), counter.count(), getTags(metricName));
   }
 
   @Override
@@ -140,9 +147,9 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
     if (flag == null) {
       log.debug("Gauge can only record long or double metric, it is " + value.getClass());
     } else if (flag.equals(true)) {
-      statsd.gauge(metricName.getName(), new Double(value.toString()), metricName.getScope());
+      statsd.gauge(metricName.getName(), new Double(value.toString()), getTags(metricName));
     } else {
-      statsd.gauge(metricName.getName(), new Long(value.toString()), metricName.getScope());
+      statsd.gauge(metricName.getName(), new Long(value.toString()), getTags(metricName));
     }
   }
 
@@ -175,7 +182,15 @@ public class NewStatsDReporter extends AbstractPollingReporter implements Metric
   }
 
   private void sendDouble(Dimension dim, double value, MetricName metricName) {
-    statsd.gauge(metricName.getName() + "." + dim.getDisplayName(), value, metricName.getScope());
+    statsd.gauge(metricName.getName() + "." + dim.getDisplayName(), value, getTags(metricName));
+  }
+
+  private String[] getTags(MetricName metricName) {
+    if (this.isTagEnabled) {
+      return new String[]{ metricName.getScope() };
+    } else {
+      return new String[] {};
+    }
   }
 
   private Boolean isDoubleParsable(final Object o) {

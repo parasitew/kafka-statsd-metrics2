@@ -51,7 +51,7 @@ Metrics can be filtered based on the metric name and the metric dimensions (min,
 ```bash
 
     # declare the reporter if new producer/consumer is used
-    metric.reporters=com.airbnb.kafka.StatsdMetricsReporter
+    metric.reporters=com.airbnb.kafka.NewStatsdMetricsReporter
 
     # declare the reporter if old producer/consumer is used
     kafka.metrics.reporters=com.airbnb.kafka.KafkaStatsdMetricsReporter
